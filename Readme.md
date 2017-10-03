@@ -88,6 +88,31 @@ Configuration
 
 ### Cmf Routing
 
+Add bundle to kernel:
+
+```php
+<?php
+// app/AppKernel.php
+
+// ...
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        $bundles = array(
+            // ...
+            new \Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
+        );
+
+        // ...
+    }
+
+    // ...
+}
+```
+
+Configure the chain routing:
+
 ```yaml
 cmf_routing:
     chain:
