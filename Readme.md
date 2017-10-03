@@ -1,3 +1,28 @@
+Topos
+=====
+
+Problem
+-------
+
+Lets say that you want these routes in your application:
+```yaml
+product-page:
+    path: /{category}/{product}
+
+user-page:
+    path: /{group}/{user}
+```
+
+The Symfony router will build regex based on your route and try to match incoming request with these regex.
+
+But regex for two different pages maybe the same, `/car/tesla` will match `product-page` route but `/scientist/tesla` will also match `product-page` route.
+
+Solution
+--------
+
+This bundle allow you to map route parameters to entity slug. For instance, the router will request your database and will not found any `Category` with `scientist` as slug. So it will go to the `user-page` route and check if any `Group` with `scientist` as slug exists.
+
+
 Installation
 ============
 
@@ -80,3 +105,4 @@ loconox_entity_routing:
     class:
         slug: Loconox\EntityRoutingBundle\Entity\Slug
 ```
+
