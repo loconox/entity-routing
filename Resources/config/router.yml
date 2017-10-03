@@ -1,0 +1,50 @@
+parameters:
+    loconox_entity_routing.route.loader.dir_annotation.class: Symfony\Component\Routing\Loader\AnnotationDirectoryLoader
+    loconox_entity_routing.route.loader.file_annotation.class: Symfony\Component\Routing\Loader\AnnotationFileLoader
+    loconox_entity_routing.route.loader.class: Symfony\Component\Config\Loader\DelegatingLoader
+    loconox_entity_routing.route.loader_resolver.class: Symfony\Component\Config\Loader\LoaderResolver
+    loconox_entity_routing.route.loader.yml.class: Loconox\EntityRoutingBundle\Loader\YamlFileLoader
+    loconox_entity_routing.route.loader.xml.class: Loconox\EntityRoutingBundle\Loader\XmlFileLoader
+    loconox_entity_routing.annotation.route.class: Loconox\EntityRoutingBundle\Annotation\Route
+
+services:
+    loconox_entity_routing.router:
+        class: Loconox\EntityRoutingBundle\Route\SlugRouter
+        arguments: [ "@loconox_entity_routing.slug.service.manager", "@loconox_entity_routing.manager.slug", "%router.resource%", "@loconox_entity_routing.route.loader" ]
+
+    loconox_entity_routing.route.loader_resolver:
+        class: "%loconox_entity_routing.route.loader_resolver.class%"
+
+    loconox_entity_routing.route.loader:
+        class: "%loconox_entity_routing.route.loader.class%"
+        arguments: [ "@loconox_entity_routing.route.loader_resolver" ]
+
+    loconox_entity_routing.route.loader.class_annotation:
+        class: Loconox\EntityRoutingBundle\Loader\AnnotationClassLoader
+        arguments: [ "@annotation_reader" ]
+        calls:
+            - [ setRouteAnnotationClass, [ "%loconox_entity_routing.annotation.route.class%"]]
+
+    loconox_entity_routing.route.loader.dir_annotation:
+        class: "%loconox_entity_routing.route.loader.dir_annotation.class%"
+        arguments: [ "@file_locator", "@loconox_entity_routing.route.loader.class_annotation" ]
+        tags:
+            - { name: loconox_entity_routing.loader }
+
+    loconox_entity_routing.route.loader.file_annotation:
+        class: "%loconox_entity_routing.route.loader.file_annotation.class%"
+        arguments: [ "@file_locator", "@loconox_entity_routing.route.loader.class_annotation" ]
+        tags:
+            - { name: loconox_entity_routing.loader }
+
+    loconox_entity_routing.route.loader.yml:
+        class: "%loconox_entity_routing.route.loader.yml.class%"
+        arguments: [ "@file_locator" ]
+        tags:
+            - { name: loconox_entity_routing.loader }
+
+    loconox_entity_routing.route.loader.xml:
+        class: "%loconox_entity_routing.route.loader.xml.class%"
+        arguments: [ "@file_locator" ]
+        tags:
+            - { name: loconox_entity_routing.loader }

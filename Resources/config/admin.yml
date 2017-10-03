@@ -1,0 +1,17 @@
+services:
+    loconox_entity_routing.admin.extension.slug:
+        class: Loconox\EntityRoutingBundle\Admin\Extension\SlugAdminExtension
+        calls:
+            - [ setDispatcher, [ "@event_dispatcher" ]]
+        tags:
+            - { name: sonata.admin.extension, target: adw_broadcast.admin.channel }
+    loconox_entity_routing.admin.slug:
+        class: Loconox\EntityRoutingBundle\Admin\SlugAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "CMS", label: "Slug" }
+        arguments:
+            - ~
+            - "%loconox_entity_routing.slug.class%"
+            - ~
+        calls:
+            - [ setSlugServiceManager, [ "@loconox_entity_routing.slug.service.manager" ]]

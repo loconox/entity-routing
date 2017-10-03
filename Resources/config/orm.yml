@@ -1,0 +1,10 @@
+services:
+    loconox_entity_routing.entity_manager:
+        class: "%doctrine.orm.entity_manager.class%"
+        public: false
+        factory:  [ "@doctrine", getManager ]
+        arguments:
+            - "%loconox_entity_routing.entity_manager%"
+    loconox_entity_routing.manager.slug:
+        class: Loconox\EntityRoutingBundle\Entity\SlugManager
+        arguments: [ "@loconox_entity_routing.entity_manager", "%loconox_entity_routing.slug.class%" ]

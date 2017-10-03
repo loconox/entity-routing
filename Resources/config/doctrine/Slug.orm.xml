@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Loconox\EntityRoutingBundle\Entity\Slug">
+
+        <id name="id" column="id" type="integer" >
+            <generator strategy="AUTO" />
+        </id>
+        <field name="slug" type="string" column="slug" length="255" />
+        <field name="type" type="string" column="type" length="255" nullable="true"/>
+        <field name="entityId" type="string" column="entity_id" length="255" nullable="true"/>
+        <field name="createdAt" type="datetime" column="created_at"/>
+        <field name="updatedAt" type="datetime" column="updated_at"/>
+
+        <one-to-one field="new" target-entity="Loconox\EntityRoutingBundle\Entity\Slug" inversed-by="old"/>
+        <one-to-one field="old" target-entity="Loconox\EntityRoutingBundle\Entity\Slug" mapped-by="new"/>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="prePersist" method="prePersist"/>
+            <lifecycle-callback type="preUpdate" method="preUpdate"/>
+        </lifecycle-callbacks>
+
+        <indexes>
+            <index columns="slug" />
+        </indexes>
+
+    </entity>
+</doctrine-mapping>

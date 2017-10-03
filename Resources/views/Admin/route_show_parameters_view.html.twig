@@ -1,0 +1,9 @@
+{% extends 'SonataAdminBundle:CRUD:base_show_field.html.twig' %}
+
+{% block field %}
+    {% for element in object.routeElements %}
+        {% if element.name is not null %}
+            {{ '{"' ~ element.name ~ '": "' ~ element.slug.slug ~ '"}' }}
+        {% endif %}
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    <div>
+        {% for element in object.routeElements %}
+            {% if element.name is not null and element.slug is not null %}
+                {{ '{"' ~ element.name ~ '": "' ~ element.slug.slug ~ '"}' }}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

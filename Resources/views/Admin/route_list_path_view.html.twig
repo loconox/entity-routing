@@ -1,0 +1,13 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    <div>
+        {% set slugAdmin = sonata_admin.adminPool.adminByAdminCode('loconox_entity_routing.admin.slug') %}
+        {% spaceless %}
+            {% for slug in admin.slugs(object) %}
+                {{ constant('ADW\\Bundle\\RoutingBundle\\Model\\RouteInterface::SEPARATOR') }}<a
+                href="{{ slugAdmin.generateObjectUrl('show', slug) }}" >{{ slug.slug }}</a>
+            {% endfor %}
+        {% endspaceless %}
+    </div>
+{% endblock %}

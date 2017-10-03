@@ -1,0 +1,31 @@
+{
+    "name": "loconox/entity-routing-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony EntityRoutingBundle",
+    "keywords": ["Routing", "Entity"],
+    "homepage": "https://github.com/loconox/EntityRoutingBundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérémie Libeau",
+            "email": "dev@jeremielibeau.fr"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "symfony/symfony": ">=2.8",
+        "symfony-cmf/routing-bundle": "^1.4|^2.0",
+        "sensio/framework-extra-bundle": "~3.0",
+        "sonata-project/doctrine-extensions": "~1.0",
+        "doctrine/orm": "~2.5"
+    },
+    "suggest": {
+        "sonata-project/admin-bundle": "Admin for slugs and routes"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~5.0"
+    },
+    "autoload": {
+        "psr-4": {"Loconox\\EntityRoutingBundle\\": ""}
+    }
+}
