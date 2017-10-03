@@ -107,3 +107,7 @@ loconox_entity_routing:
         slug: Loconox\EntityRoutingBundle\Entity\Slug
 ```
 
+Usage
+-----
+
+See [usage guide](Resources/doc/Usage.md).
