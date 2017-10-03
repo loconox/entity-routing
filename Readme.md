@@ -1,8 +1,13 @@
-Topos
-=====
+LoconoxEntityRoutingBundle
+==========================
 
-Problem
--------
+[![Build Status](https://travis-ci.org/loconox/EntityRoutingBundle.svg?branch=master)](https://travis-ci.org/loconox/EntityRoutingBundle)
+
+Topos
+-----
+
+### Problem
+
 
 Lets say that you want these routes in your application:
 ```yaml
