@@ -22,17 +22,17 @@ The Symfony router will build regex based on your route and try to match incomin
 
 But regex for two different pages maybe the same, `/car/tesla` will match `product-page` route but `/scientist/tesla` will also match `product-page` route.
 
-Solution
---------
+### Solution
+
 
 This bundle allow you to map route parameters to entity slug. For instance, the router will request your database and will not found any `Category` with `scientist` as slug. So it will go to the `user-page` route and check if any `Group` with `scientist` as slug exists.
 
 
 Installation
-============
+------------
 
-Step 1: Download the Bundle
----------------------------
+### Step 1: Download the Bundle
+
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
@@ -45,8 +45,7 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
-Step 2: Enable the Bundle
--------------------------
+### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
 in the `app/AppKernel.php` file of your project:
@@ -73,10 +72,9 @@ class AppKernel extends Kernel
 ```
 
 Requirements
-============
+------------
 
-PCRE
-----
+### PCRE
 
     $ ./configure --enable-utf --enable-pcre16 --enable-pcre32 --prefix=/opt/local --enable-unicode-properties
 
@@ -86,10 +84,9 @@ The command above should print at least "UTF-8 support" and "Unicode properties 
     $ pcretest -C
 
 Configuration
-=============
+-------------
 
-Cmf Routing
------------
+### Cmf Routing
 
 ```yaml
 cmf_routing:
@@ -99,8 +96,7 @@ cmf_routing:
             router.default: 75
 ```
 
-Routing bundle
---------------
+### Routing bundle
 
 Optionally, you can specify a different entity manager for your slug to be store and a specific class.
 
