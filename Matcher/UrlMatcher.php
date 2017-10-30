@@ -116,27 +116,32 @@ class UrlMatcher extends BaseUrlMatcher
 
             $mismatch = false;
             foreach ($attributes as $attr => &$value) {
-                if (false !== $slugService = $this->slugServiceManager->get($attr)) {
-                    /** @var Slug $slug */
-                    $slug = $this->slugManager->findOneBy(
-                        [
-                            'type' => $attr,
-                            'slug' => $value,
-                        ]
-                    );
-
-                    // Slug not found, maybe it's another route with the same regex
-                    if ( ! $slug) {
-                        $mismatch = true;
-                        break;
-                    }
-
-                    // Slug found be there is a new one, do redirect
-                    if ($slug->getNew() !== null) {
-                        $attributes['_controller'] = 'FrameworkBundle:Redirect:urlRedirect';
-                    }
-                    $value = $slugService->getEntity($slug);
+                $slugService = $this->getSlugService($attr, $route);
+                if ( ! $slugService) {
+                    continue;
                 }
+                $type = $slugService->getAlias();
+
+                /** @var Slug $slug */
+                $slug = $this->slugManager->findOneBy(
+                    [
+                        'type' => $type,
+                        'slug' => $value,
+                    ]
+                );
+
+                // Slug not found, maybe it's another route with the same regex
+                if ( ! $slug) {
+                    $mismatch = true;
+                    break;
+                }
+
+                // Slug found be there is a new one, do redirect
+                if ($slug->getNew() !== null) {
+                    $attributes['_controller'] = 'FrameworkBundle:Redirect:urlRedirect';
+                }
+                $value = $slugService->getEntity($slug);
+
             }
 
             if ($mismatch) {
@@ -145,5 +150,19 @@ class UrlMatcher extends BaseUrlMatcher
 
             return $attributes;
         }
+    }
+
+    private function getSlugService($attr, $route)
+    {
+        if (false !== $slugService = $this->slugServiceManager->get($attr)) {
+            return $slugService;
+        }
+
+        $types = $route->getOption('types');
+        if (isset($types[$attr]) && (false !== $slugService = $this->slugServiceManager->get($types[$attr]))) {
+            return $slugService;
+        }
+
+        return null;
     }
 }
