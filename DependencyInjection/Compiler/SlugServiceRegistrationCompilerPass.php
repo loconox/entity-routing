@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 09/12/2014
- * Time: 10:00
- */
 
 namespace Loconox\EntityRoutingBundle\DependencyInjection\Compiler;
 

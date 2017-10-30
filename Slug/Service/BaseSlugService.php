@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 09/12/2014
- * Time: 15:13
- */
+
 
 namespace Loconox\EntityRoutingBundle\Slug\Service;
 

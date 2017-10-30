@@ -15,12 +15,6 @@ use Symfony\Component\Routing\Generator\UrlGenerator as BaseUrlGenerator;
 use Symfony\Component\Validator\ConstraintViolation;
 
 
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 30/05/2017
- * Time: 15:46
- */
 class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
     /**

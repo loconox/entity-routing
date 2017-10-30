@@ -11,12 +11,6 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 01/06/2017
- * Time: 12:10
- */
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
 

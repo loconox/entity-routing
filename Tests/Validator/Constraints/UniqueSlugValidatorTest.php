@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 06/01/2015
- * Time: 14:25
- */
 
 namespace Loconox\EntityRoutingBundle\Tests\Validator\Constraints;
 

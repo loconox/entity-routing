@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 02/10/15
- * Time: 11:02
- */
 
 namespace Loconox\EntityRoutingBundle\Twig;
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 16/12/2014
- * Time: 16:14
- */
 
 namespace Loconox\EntityRoutingBundle\Listener;
 

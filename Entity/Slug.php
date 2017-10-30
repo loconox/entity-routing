@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 05/12/2014
- * Time: 11:31
- */
 
 namespace Loconox\EntityRoutingBundle\Entity;
 

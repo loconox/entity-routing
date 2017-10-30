@@ -11,12 +11,6 @@ use Symfony\Component\Routing\Matcher\UrlMatcher as BaseUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 30/05/2017
- * Time: 17:33
- */
 class UrlMatcher extends BaseUrlMatcher
 {
     /**

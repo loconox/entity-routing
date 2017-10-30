@@ -16,12 +16,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-/**
- * Created by PhpStorm.
- * User: loconox
- * Date: 31/05/2017
- * Time: 15:56
- */
 class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
