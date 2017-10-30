@@ -6,6 +6,7 @@ use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
@@ -45,18 +46,24 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
         $this->slugServiceManager = $slugServiceManager;
     }
 
-    protected function doGenerate(
-        $variables,
-        $defaults,
-        $requirements,
-        $tokens,
-        $parameters,
-        $name,
-        $referenceType,
-        $hostTokens,
-        array $requiredSchemes = array()
-    ) {
-        $variables    = array_flip($variables);
+    /**
+     * {@inheritdoc}
+     */
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    {
+        if (null === $route = $this->routes->get($name)) {
+            throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
+        }
+
+        // the Route has a cache of its own and is not recompiled as long as it does not get modified
+        $compiledRoute = $route->compile();
+
+        $variables = array_flip($compiledRoute->getVariables());
+        $defaults = $route->getDefaults();
+        $requirements = $route->getRequirements();
+        $tokens = $compiledRoute->getTokens();
+        $hostTokens = $compiledRoute->getHostTokens();
+        $requiredSchemes = $route->getSchemes();
         $mergedParams = array_replace($defaults, $this->context->getParameters(), $parameters);
 
         // all params must be given
@@ -85,8 +92,9 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
                         $defaults
                     ) || null !== $mergedParams[$varName] && (string)$mergedParams[$varName] !== (string)$defaults[$varName]
                 ) {
+                    $slugService = $this->getSlugService($varName, $route);
                     // It's a entity slug
-                    if (false != $slugService = $this->slugServiceManager->get($varName)) {
+                    if ($slugService) {
                         $violations = $slugService->validate($mergedParams[$varName]);
                         if (count($violations) > 0) {
                             /** @var ConstraintViolation $first */
@@ -257,5 +265,19 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
         }
 
         return $url;
+    }
+
+    private function getSlugService($attr, $route)
+    {
+        if (false !== $slugService = $this->slugServiceManager->get($attr)) {
+            return $slugService;
+        }
+
+        $types = $route->getOption('types');
+        if (isset($types[$attr]) && (false !== $slugService = $this->slugServiceManager->get($types[$attr]))) {
+            return $slugService;
+        }
+
+        return null;
     }
 }
