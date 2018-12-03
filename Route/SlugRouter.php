@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
 {
@@ -71,23 +72,41 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
     protected $matcher;
 
     /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var array
+     */
+    protected $resources;
+
+    /**
      * @param SlugServiceManager $slugServiceManager
      * @param SlugManager $slugManager
-     * @param string $resource
+     * @param $resources
      * @param LoaderInterface $loader
-     *
      */
     public function __construct(
         SlugServiceManager $slugServiceManager,
         SlugManager $slugManager,
-        $resource,
+        $resources,
         LoaderInterface $loader
-    ) {
+    )
+    {
         $this->slugServiceManager = $slugServiceManager;
-        $this->slugManager         = $slugManager;
-        $this->resource             = $resource;
-        $this->loader               = $loader;
-        $this->cache                = [];
+        $this->slugManager = $slugManager;
+        $this->resources = $resources;
+        $this->loader = $loader;
+        $this->cache = [];
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 
     /**
@@ -116,7 +135,10 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
     public function getRouteCollection()
     {
         if (null === $this->collection) {
-            $this->collection = $this->loader->load($this->resource);
+            $this->collection = new RouteCollection();
+            foreach ($this->resources as $resource) {
+                $this->collection->addCollection($this->loader->load($resource['resource'], $resource['type']));
+            }
         }
 
         return $this->collection;
@@ -188,7 +210,7 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
             $redirect = [
                 '_controller' => $controller,
                 '_route' => '',
-                'path' =>  $this->getGenerator()->generate($routeName, $match),
+                'path' => $this->getGenerator()->generate($routeName, $match),
                 'params' => array(),
                 'permanent' => true,
             ];

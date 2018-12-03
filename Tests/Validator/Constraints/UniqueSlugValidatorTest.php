@@ -6,9 +6,9 @@ use Loconox\EntityRoutingBundle\Validator\Constraints\UniqueSlug;
 use Loconox\EntityRoutingBundle\Entity\Slug;
 use Loconox\EntityRoutingBundle\Validator\Constraints\UniqueSlugValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use PHPUnit\Framework\TestCase;
 
-class UniqueSlugValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueSlugValidatorTest extends TestCase
 {
     public function testValidate()
     {

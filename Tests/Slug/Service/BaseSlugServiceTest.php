@@ -3,8 +3,9 @@
 namespace Loconox\EntityRoutingBundle\Tests\Slug\Service;
 
 use Loconox\EntityRoutingBundle\Entity\Slug;
+use PHPUnit\Framework\TestCase;
 
-class BaseSlugServiceTest extends \PHPUnit_Framework_TestCase
+class BaseSlugServiceTest extends TestCase
 {
     public function testGetClass()
     {

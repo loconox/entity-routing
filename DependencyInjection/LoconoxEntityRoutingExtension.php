@@ -35,6 +35,7 @@ class LoconoxEntityRoutingExtension extends Extension
 
         $container->setParameter('loconox_entity_routing.entity_manager', $config['entity_manager']);
         $container->setParameter('loconox_entity_routing.slug.class', $config['class']['slug']);
+        $container->setParameter('loconox_entity_routing.routes', $config['routes']);
 
         //$this->registerDoctrineMapping($config, $container);
     }

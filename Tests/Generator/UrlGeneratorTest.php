@@ -6,17 +6,17 @@ use Loconox\EntityRoutingBundle\Entity\Slug;
 use Loconox\EntityRoutingBundle\Generator\UrlGenerator;
 use Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
+class UrlGeneratorTest extends TestCase
 {
     /**
      * @param $name

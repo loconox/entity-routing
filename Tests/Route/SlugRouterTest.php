@@ -9,12 +9,11 @@ use Loconox\EntityRoutingBundle\Route\SlugRouter;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use PHPUnit\Framework\TestCase;
 
-class SlugRouterTest extends \PHPUnit_Framework_TestCase
+class SlugRouterTest extends TestCase
 {
     /**
      * @var SlugServiceManager

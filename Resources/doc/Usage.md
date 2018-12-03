@@ -34,10 +34,10 @@ Create a `ProductSlugService` class and implement the different functions corres
 ```php
 <?php
 
-namespace AppBundle\Slug\Service;
+namespace App\Slug\Service;
 
 
-use AppBundle\Entity\Product;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManager;
 use Loconox\EntityRoutingBundle\Model\SlugInterface;
 use Loconox\EntityRoutingBundle\Slug\Service\BaseSlugService;

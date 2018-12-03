@@ -10,8 +10,9 @@ use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use PHPUnit\Framework\TestCase;
 
-class UrlMatcherTest extends \PHPUnit_Framework_TestCase
+class UrlMatcherTest extends TestCase
 {
 
     public function testMatch()
@@ -47,6 +48,9 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
                     ->method('getEntity')
                     ->with($this->equalTo($slug))
                     ->willReturn($entity);
+        $slugService
+            ->method('getAlias')
+            ->willReturn($type);
 
         $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
                                    ->getMock();
@@ -95,7 +99,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
                     ->willReturnCallback(function ($params) use ($type2, $slugValue, $slug) {
                         $type = $params['type'];
                         $value = $params['slug'];
-                        if ($type == $type2 && $value == $slugValue) {
+                        if ($type === $type2 && $value === $slugValue) {
                             return $slug;
                         }
 
@@ -106,6 +110,9 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
                             ->getMock();
         $slugService1->expects($this->never())
                     ->method('getEntity');
+        $slugService1
+            ->method('getAlias')
+            ->willReturn($type1);
 
         $slugService2 = $this->getMockBuilder(SlugServiceInterface::class)
                              ->getMock();
@@ -113,6 +120,9 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
                      ->method('getEntity')
                      ->with($this->equalTo($slug))
                      ->willReturn($entity);
+        $slugService2
+            ->method('getAlias')
+            ->willReturn($type2);
 
         $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
                                    ->getMock();
@@ -166,6 +176,9 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
                      ->method('getEntity')
                      ->with($this->equalTo($slug))
                      ->willReturn($entity);
+        $slugService
+            ->method('getAlias')
+            ->willReturn($type);
 
 
         $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)

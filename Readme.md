@@ -48,27 +48,16 @@ of the Composer documentation.
 ### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
-in the `app/AppKernel.php` file of your project:
+in the `config/bundles.php` file of your project:
 
 ```php
 <?php
-// app/AppKernel.php
+// config/bundles.php
 
-// ...
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-            new \Loconox\EntityRoutingBundle\LoconoxEntityRoutingBundle(),
-        );
-
-        // ...
-    }
-
+return [
     // ...
-}
+    Loconox\EntityRoutingBundle\LoconoxEntityRoutingBundle::class => ['all' => true],
+];
 ```
 
 Requirements
@@ -88,32 +77,22 @@ Configuration
 
 ### Cmf Routing
 
-Add bundle to kernel:
+Register the bundle:
 
 ```php
 <?php
-// app/AppKernel.php
+// config/bundles.php
 
-// ...
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-            new \Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
-        );
-
-        // ...
-    }
-
+return [
     // ...
-}
+    Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle::class => ['all' => true],
+];
 ```
 
 Configure the chain routing:
 
 ```yaml
+# config/packages/cmf_routing.yaml
 cmf_routing:
     chain:
         routers_by_id:
@@ -126,6 +105,7 @@ cmf_routing:
 Optionally, you can specify a different entity manager for your slug to be store and a specific class.
 
 ```yaml
+# config/packages/loconox_entity_routing.yaml
 loconox_entity_routing:
     entity_manager: default
     class:

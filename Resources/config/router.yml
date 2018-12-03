@@ -5,12 +5,18 @@ parameters:
     loconox_entity_routing.route.loader_resolver.class: Symfony\Component\Config\Loader\LoaderResolver
     loconox_entity_routing.route.loader.yml.class: Loconox\EntityRoutingBundle\Loader\YamlFileLoader
     loconox_entity_routing.route.loader.xml.class: Loconox\EntityRoutingBundle\Loader\XmlFileLoader
+    loconox_entity_routing.route.loader.service.class: Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader
+    loconox_entity_routing.route.loader.glob.class: Symfony\Component\Routing\Loader\GlobFileLoader
     loconox_entity_routing.annotation.route.class: Loconox\EntityRoutingBundle\Annotation\Route
 
 services:
     loconox_entity_routing.router:
         class: Loconox\EntityRoutingBundle\Route\SlugRouter
-        arguments: [ "@loconox_entity_routing.slug.service.manager", "@loconox_entity_routing.manager.slug", "%router.resource%", "@loconox_entity_routing.route.loader" ]
+        arguments:
+            - "@loconox_entity_routing.slug.service.manager"
+            - "@loconox_entity_routing.manager.slug"
+            - "%loconox_entity_routing.routes%"
+            - "@loconox_entity_routing.route.loader"
 
     loconox_entity_routing.route.loader_resolver:
         class: "%loconox_entity_routing.route.loader_resolver.class%"
@@ -37,14 +43,3 @@ services:
         tags:
             - { name: loconox_entity_routing.loader }
 
-    loconox_entity_routing.route.loader.yml:
-        class: "%loconox_entity_routing.route.loader.yml.class%"
-        arguments: [ "@file_locator" ]
-        tags:
-            - { name: loconox_entity_routing.loader }
-
-    loconox_entity_routing.route.loader.xml:
-        class: "%loconox_entity_routing.route.loader.xml.class%"
-        arguments: [ "@file_locator" ]
-        tags:
-            - { name: loconox_entity_routing.loader }

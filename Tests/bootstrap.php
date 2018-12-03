@@ -1,7 +1,9 @@
 <?php
 
 $files = array(
+    __DIR__.'/../vendor/autoload.php',
     __DIR__.'/../../vendor/autoload.php',
+    __DIR__.'/../../../vendor/autoload.php',
     __DIR__.'/../../../../vendor/autoload.php',
 );
 
@@ -21,6 +23,5 @@ wget http://getcomposer.org/composer.phar
 php composer.phar install
 
 Visit http://getcomposer.org/ for more information.
-
 ');
 }

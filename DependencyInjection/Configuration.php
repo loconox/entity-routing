@@ -29,6 +29,17 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('slug')->cannotBeEmpty()->defaultValue('Loconox\\EntityRoutingBundle\\Entity\\Slug')->end()
                     ->end()
                 ->end()
+                ->arrayNode('routes')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                            ->scalarNode('type')->cannotBeEmpty()->defaultValue('annotation')->end()
+                            ->scalarNode('resource')->cannotBeEmpty()->defaultValue('../src/Controller')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
