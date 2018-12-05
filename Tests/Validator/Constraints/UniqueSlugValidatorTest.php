@@ -2,6 +2,7 @@
 
 namespace Loconox\EntityRoutingBundle\Tests\Validator\Constraints;
 
+use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Loconox\EntityRoutingBundle\Validator\Constraints\UniqueSlug;
 use Loconox\EntityRoutingBundle\Entity\Slug;
 use Loconox\EntityRoutingBundle\Validator\Constraints\UniqueSlugValidator;
@@ -27,7 +28,7 @@ class UniqueSlugValidatorTest extends TestCase
                 ->will($this->returnValue($slug));
 
         $slugServiceManager = $this->getMockBuilder(
-            'Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface'
+            SlugServiceManager::class
         )->getMock();
         $slugServiceManager->expects($this->once())
                            ->method('get')
@@ -64,7 +65,7 @@ class UniqueSlugValidatorTest extends TestCase
                 ->will($this->returnValue($slug));
 
         $slugServiceManager = $this->getMockBuilder(
-            'Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface'
+            SlugServiceManager::class
         )->getMock();
         $slugServiceManager->expects($this->once())
                            ->method('get')
@@ -105,7 +106,7 @@ class UniqueSlugValidatorTest extends TestCase
                 ->will($this->returnValue($slug));
 
         $slugServiceManager = $this->getMockBuilder(
-            'Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface'
+            SlugServiceManager::class
         )->getMock();
         $slugServiceManager->expects($this->once())
                            ->method('get')
@@ -159,7 +160,7 @@ class UniqueSlugValidatorTest extends TestCase
                 ->will($this->returnValue($slug));
 
         $slugServiceManager = $this->getMockBuilder(
-            'Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface'
+            SlugServiceManager::class
         )->getMock();
         $slugServiceManager->expects($this->once())
                            ->method('get')

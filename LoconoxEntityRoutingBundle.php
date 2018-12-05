@@ -2,6 +2,7 @@
 
 namespace Loconox\EntityRoutingBundle;
 
+use Loconox\EntityRoutingBundle\DependencyInjection\Compiler\HostServiceRegistrationCompilerPass;
 use Loconox\EntityRoutingBundle\DependencyInjection\Compiler\LoaderResolverCompilerPass;
 use Loconox\EntityRoutingBundle\DependencyInjection\Compiler\SlugServiceRegistrationCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -17,6 +18,7 @@ class LoconoxEntityRoutingBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new SlugServiceRegistrationCompilerPass());
+        $container->addCompilerPass(new HostServiceRegistrationCompilerPass());
         $container->addCompilerPass(new LoaderResolverCompilerPass());
     }
 }

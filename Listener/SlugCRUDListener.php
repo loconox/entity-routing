@@ -2,21 +2,21 @@
 
 namespace Loconox\EntityRoutingBundle\Listener;
 
-use Loconox\EntityRoutingBundle\Entity\RouteManager;
+
 use Loconox\EntityRoutingBundle\Event\SlugEvent;
 use Loconox\EntityRoutingBundle\Events;
-use Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface;
+use Loconox\EntityRoutingBundle\Service\AbstractServiceManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SlugCRUDListener implements EventSubscriberInterface
 {
 
     /**
-     * @var SlugServiceManagerInterface
+     * @var AbstractServiceManager
      */
     protected $serviceManager;
 
-    function __construct(SlugServiceManagerInterface $serviceManager)
+    function __construct(AbstractServiceManager $serviceManager)
     {
         $this->serviceManager = $serviceManager;
     }

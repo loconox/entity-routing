@@ -4,7 +4,7 @@ namespace Loconox\EntityRoutingBundle\Validator\Constraints;
 
 use Loconox\EntityRoutingBundle\Exception\SlugServiceNotFoundException;
 use Loconox\EntityRoutingBundle\Model\SlugManagerInterface;
-use Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface;
+use Loconox\EntityRoutingBundle\Service\AbstractServiceManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -17,11 +17,11 @@ class UniqueSlugValidator extends ConstraintValidator
     protected $slugManager;
 
     /**
-     * @var SlugServiceManagerInterface
+     * @var AbstractServiceManager
      */
     protected $slugServiceManager;
 
-    function __construct(SlugServiceManagerInterface $slugServiceManager, SlugManagerInterface $slugManager)
+    function __construct(AbstractServiceManager $slugServiceManager, SlugManagerInterface $slugManager)
     {
         $this->slugManager = $slugManager;
         $this->slugServiceManager = $slugServiceManager;

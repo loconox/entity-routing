@@ -4,6 +4,9 @@ namespace Loconox\EntityRoutingBundle\Tests\Generator;
 
 use Loconox\EntityRoutingBundle\Entity\Slug;
 use Loconox\EntityRoutingBundle\Generator\UrlGenerator;
+use Loconox\EntityRoutingBundle\Host\HostServiceManager;
+use Loconox\EntityRoutingBundle\Host\Service\HostServiceInterface;
+use Loconox\EntityRoutingBundle\Route\RouteCompiler;
 use Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +31,10 @@ class UrlGeneratorTest extends TestCase
      */
     public function testGenerate($name, $parameters, $routes, $slugData, $expected)
     {
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $routeCollection = new RouteCollection();
         $context         = $this->getMockBuilder(RequestContext::class)
                                 ->getMock();
@@ -65,9 +72,17 @@ class UrlGeneratorTest extends TestCase
         }
         $slugServiceManager->expects($this->any())
                            ->method('get')
-                           ->willReturnMap($slugServices);
+                            ->willReturnCallback(function($type) use ($slugServices) {
+                                foreach ($slugServices as $data) {
+                                    if ($data[0] === $type) {
+                                        return $data[1];
+                                    }
+                                }
 
-        $generator = new UrlGenerator($routeCollection, $context, null, $slugServiceManager);
+                                return false;
+                            });
+
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
 
         // Init route collection
         foreach ($routes as $routeName => $route) {
@@ -162,6 +177,10 @@ class UrlGeneratorTest extends TestCase
         $routeName = 'foo';
         $route     = new Route('/{bar}');
 
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $routeCollection = new RouteCollection();
         $context         = $this->getMockBuilder(RequestContext::class)
                                 ->getMock();
@@ -188,7 +207,7 @@ class UrlGeneratorTest extends TestCase
         $slugServiceManager->expects($this->never())
                            ->method('get');
 
-        $generator = new UrlGenerator($routeCollection, $context, null, $slugServiceManager);
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
 
         $routeCollection->add($routeName, $route);
 
@@ -204,6 +223,10 @@ class UrlGeneratorTest extends TestCase
         $routeName = 'baz';
         $route     = new Route('/{bar}');
 
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $routeCollection = new RouteCollection();
         $context         = $this->getMockBuilder(RequestContext::class)
                                 ->getMock();
@@ -229,7 +252,7 @@ class UrlGeneratorTest extends TestCase
         $slugServiceManager->expects($this->never())
                            ->method('get');
 
-        $generator = new UrlGenerator($routeCollection, $context, null, $slugServiceManager);
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
 
         $routeCollection->add($routeName, $route);
 
@@ -244,6 +267,10 @@ class UrlGeneratorTest extends TestCase
         $slugValue = 'toto';
         $routeName = 'foo';
         $route     = new Route('/{bar}');
+
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $routeCollection = new RouteCollection();
         $context         = $this->getMockBuilder(RequestContext::class)
@@ -279,7 +306,7 @@ class UrlGeneratorTest extends TestCase
                            ->with($this->equalTo($type))
                            ->willReturn($slugService);
 
-        $generator = new UrlGenerator($routeCollection, $context, null, $slugServiceManager);
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
 
         $routeCollection->add($routeName, $route);
 
@@ -293,6 +320,10 @@ class UrlGeneratorTest extends TestCase
         $slugValue = 'toto';
         $routeName = 'foo';
         $route     = new Route('/{bar}');
+
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $routeCollection = new RouteCollection();
         $context         = $this->getMockBuilder(RequestContext::class)
@@ -330,11 +361,122 @@ class UrlGeneratorTest extends TestCase
                            ->with($this->equalTo($type))
                            ->willReturn($slugService);
 
-        $generator = new UrlGenerator($routeCollection, $context, null, $slugServiceManager);
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
 
         $routeCollection->add($routeName, $route);
 
         $this->expectException(InvalidParameterException::class);
         $generator->generate($routeName, ['bar' => $entity]);
+    }
+
+    public function testGenerateAbsoluteUrl()
+    {
+        $routeName = 'foo';
+        $path = '/';
+        $route     = new Route($path);
+        $host = 'toto.fr';
+        $scheme = 'http';
+        $port = 4242;
+
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $routeCollection = new RouteCollection();
+
+        $context         = $this->getMockBuilder(RequestContext::class)
+            ->getMock();
+        $context
+            ->expects($this->any())
+            ->method('getHost')
+            ->willReturn($host);
+        $context
+            ->expects($this->atLeastOnce())
+            ->method('getScheme')
+            ->willReturn($scheme);
+        $context
+            ->expects($this->atLeastOnce())
+            ->method('getHttpPort')
+            ->willReturn($port);
+        $context->expects($this->any())
+            ->method('getParameters')
+            ->willReturn([]);
+
+        // Init slugs
+        $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
+            ->getMock();
+        $slugServiceManager->expects($this->any())
+            ->method('get')
+            ->willReturn(false);
+
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
+
+        $routeCollection->add($routeName, $route);
+
+        $this->assertEquals($scheme.'://'.$host.':'.$port.$path, $generator->generate($routeName, [], UrlGenerator::ABSOLUTE_URL));
+    }
+
+    public function testGenerateWithHostParameter()
+    {
+        $routeName = 'foo';
+        $type = 'bar';
+        $path = '/';
+        $route     = new Route($path);
+        $route->setHost('{'.$type.'}');
+        $route->setOption('compiler_class', RouteCompiler::class);
+        $host = 'toto.fr';
+        $scheme = 'http';
+        $port = 4242;
+        $entity = new \stdClass();
+
+        $hostService = $this->getMockBuilder(HostServiceInterface::class)
+            ->getMock();
+        $hostService
+            ->expects($this->atLeastOnce())
+            ->method('getHost')
+            ->with($entity)
+            ->willReturn($host);
+
+        $hostServiceManager = $this->getMockBuilder(HostServiceManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $hostServiceManager
+            ->expects($this->atLeastOnce())
+            ->method('get')
+            ->with($this->equalTo($type), $this->equalTo($route))
+            ->willReturn($hostService);
+
+        $routeCollection = new RouteCollection();
+
+        $context         = $this->getMockBuilder(RequestContext::class)
+            ->getMock();
+        $context
+            ->expects($this->any())
+            ->method('getHost')
+            ->willReturn(null);
+        $context
+            ->expects($this->atLeastOnce())
+            ->method('getScheme')
+            ->willReturn($scheme);
+        $context
+            ->expects($this->atLeastOnce())
+            ->method('getHttpPort')
+            ->willReturn($port);
+        $context->expects($this->any())
+            ->method('getParameters')
+            ->willReturn([]);
+
+        // Init slugs
+        $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
+            ->getMock();
+        $slugServiceManager->expects($this->any())
+            ->method('get')
+            ->willReturn(false);
+
+        $generator = new UrlGenerator($routeCollection, $context, $slugServiceManager, $hostServiceManager);
+
+        $routeCollection->add($routeName, $route);
+
+        $this->assertEquals($scheme.'://'.$host.':'.$port.$path, $generator->generate($routeName, [$type => $entity], UrlGenerator::ABSOLUTE_URL));
     }
 }

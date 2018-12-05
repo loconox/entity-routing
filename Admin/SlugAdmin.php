@@ -3,7 +3,7 @@
 namespace Loconox\EntityRoutingBundle\Admin;
 
 use Loconox\EntityRoutingBundle\Form\Transformer\SettingsTransformer;
-use Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface;
+use Loconox\EntityRoutingBundle\Service\AbstractServiceManager;
 use Sonata\AdminBundle\Admin\Admin;
 use Sonata\AdminBundle\Datagrid\DatagridMapper;
 use Sonata\AdminBundle\Datagrid\ListMapper;
@@ -15,7 +15,7 @@ class SlugAdmin extends Admin
 {
 
 	/**
-	 * @var SlugServiceManagerInterface
+	 * @var AbstractServiceManager
 	 */
 	protected $slugServiceManager;
 
@@ -77,7 +77,7 @@ class SlugAdmin extends Admin
 	}
 
 	/**
-	 * @param SlugServiceManagerInterface $slugServiceManager
+	 * @param AbstractServiceManager $slugServiceManager
 	 */
 	public function setSlugServiceManager($slugServiceManager)
 	{

@@ -24,13 +24,13 @@ class LoconoxEntityRoutingExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('router.yml');
-        $loader->load('slug.yml');
-        $loader->load('event.yml');
-        $loader->load('admin.yml');
-        $loader->load('validator.yml');
-        $loader->load('orm.yml');
-        //$loader->load('twig.yml');
+        $loader->load('router.yaml');
+        $loader->load('services.yaml');
+        $loader->load('event.yaml');
+        $loader->load('admin.yaml');
+        $loader->load('validator.yaml');
+        $loader->load('orm.yaml');
+        //$loader->load('twig.yaml');
 
 
         $container->setParameter('loconox_entity_routing.entity_manager', $config['entity_manager']);

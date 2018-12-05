@@ -3,45 +3,11 @@
 namespace Loconox\EntityRoutingBundle\Slug\Service;
 
 use Loconox\EntityRoutingBundle\Model\SlugInterface;
+use Loconox\EntityRoutingBundle\Service\ServiceInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-interface SlugServiceInterface
+interface SlugServiceInterface extends ServiceInterface
 {
-    /**
-     * Get the classe name
-     *
-     * @return string
-     */
-    public function getClass();
-
-    /**
-     * Get the service name
-     *
-     * @return
-     */
-    public function getName();
-
-    /**
-     * Set service name
-     *
-     * @param string $name
-     */
-    public function setName($name);
-
-    /**
-     * Get the service alias
-     *
-     * @return string
-     */
-    public function getAlias();
-
-    /**
-     * Set the service alias
-     *
-     * @param string $alias
-     */
-    public function setAlias($alias);
-
     /**
      * Get the entity linked to the slug
      *

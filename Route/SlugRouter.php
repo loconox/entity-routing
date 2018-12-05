@@ -12,6 +12,7 @@ namespace Loconox\EntityRoutingBundle\Route;
 
 use Loconox\EntityRoutingBundle\Entity\SlugManager;
 use Loconox\EntityRoutingBundle\Generator\UrlGenerator;
+use Loconox\EntityRoutingBundle\Host\HostServiceManager;
 use Loconox\EntityRoutingBundle\Matcher\UrlMatcher;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Symfony\Cmf\Component\Routing\VersatileGeneratorInterface;
@@ -82,16 +83,23 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
     protected $resources;
 
     /**
+     * @var HostServiceManager
+     */
+    protected $hostServiceManager;
+
+    /**
      * @param SlugServiceManager $slugServiceManager
      * @param SlugManager $slugManager
      * @param $resources
      * @param LoaderInterface $loader
+     * @param HostServiceManager $hostServiceManager
      */
     public function __construct(
         SlugServiceManager $slugServiceManager,
         SlugManager $slugManager,
         $resources,
-        LoaderInterface $loader
+        LoaderInterface $loader,
+        HostServiceManager $hostServiceManager
     )
     {
         $this->slugServiceManager = $slugServiceManager;
@@ -99,6 +107,7 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
         $this->resources = $resources;
         $this->loader = $loader;
         $this->cache = [];
+        $this->hostServiceManager = $hostServiceManager;
     }
 
     /**
@@ -177,8 +186,8 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
         $this->generator = new UrlGenerator(
             $this->getRouteCollection(),
             $this->context,
-            null,
-            $this->slugServiceManager
+            $this->slugServiceManager,
+            $this->hostServiceManager
         );
 
         return $this->generator;
@@ -231,7 +240,8 @@ class SlugRouter implements RequestMatcherInterface, VersatileGeneratorInterface
             $this->getRouteCollection(),
             $this->context,
             $this->slugServiceManager,
-            $this->slugManager
+            $this->slugManager,
+            $this->hostServiceManager
         );
 
         return $this->matcher;

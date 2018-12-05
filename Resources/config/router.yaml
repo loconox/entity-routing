@@ -17,6 +17,7 @@ services:
             - "@loconox_entity_routing.manager.slug"
             - "%loconox_entity_routing.routes%"
             - "@loconox_entity_routing.route.loader"
+            - "@loconox_entity_routing.host.service.manager"
 
     loconox_entity_routing.route.loader_resolver:
         class: "%loconox_entity_routing.route.loader_resolver.class%"

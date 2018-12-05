@@ -5,6 +5,7 @@ namespace Loconox\EntityRoutingBundle\Tests\Listener;
 use Loconox\EntityRoutingBundle\Event\SlugEvent;
 use Loconox\EntityRoutingBundle\Listener\UniqueSlugViolationListener;
 use Loconox\EntityRoutingBundle\Entity\Slug;
+use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use PHPUnit\Framework\TestCase;
 
 class UniqueSlugViolationListenerTest extends TestCase
@@ -27,22 +28,24 @@ class UniqueSlugViolationListenerTest extends TestCase
         $slugManager->expects($this->once())
             ->method('findSlugLike')
             ->with($this->equalTo($slugViolation))
-            ->will($this->returnValue([$slugFoo]));
+            ->willReturn([$slugFoo]);
 
         $service = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface')->getMock();
         $service->expects($this->once())
             ->method('createSlug')
             ->with($this->equalTo($entity), $this->equalTo(false))
-            ->will($this->returnValue($slugViolation));
+            ->willReturn($slugViolation);
         $service->expects($this->once())
             ->method('setEntitySlug')
             ->with($this->equalTo($slugViolation), $this->equalTo($entity));
 
-        $slugServiceManager = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface')->getMock();
+        $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
+            ->setMethods(['get'])
+            ->getMock();
         $slugServiceManager->expects($this->once())
             ->method('get')
             ->with($this->equalTo($entity))
-            ->will($this->returnValue($service));
+            ->willReturn($service);
 
 
         $listener = new UniqueSlugViolationListener($slugManager, $slugServiceManager);
@@ -64,22 +67,24 @@ class UniqueSlugViolationListenerTest extends TestCase
         $slugManager->expects($this->once())
             ->method('findSlugLike')
             ->with($this->equalTo($slugViolation))
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $service = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface')->getMock();
         $service->expects($this->once())
             ->method('createSlug')
             ->with($this->equalTo($entity), $this->equalTo(false))
-            ->will($this->returnValue($slugViolation));
+            ->willReturn($slugViolation);
         $service->expects($this->once())
             ->method('setEntitySlug')
             ->with($this->equalTo($slugViolation), $this->equalTo($entity));
 
-        $slugServiceManager = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface')->getMock();
+        $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
+            ->setMethods(['get'])
+            ->getMock();
         $slugServiceManager->expects($this->once())
             ->method('get')
             ->with($this->equalTo($entity))
-            ->will($this->returnValue($service));
+            ->willReturn($service);
 
 
         $listener = new UniqueSlugViolationListener($slugManager, $slugServiceManager);
@@ -89,7 +94,6 @@ class UniqueSlugViolationListenerTest extends TestCase
 
     public function testUniqueSlugVioationMultiple()
     {
-
         $entity = new \stdClass();
 
         $event = new SlugEvent($entity);
@@ -111,22 +115,24 @@ class UniqueSlugViolationListenerTest extends TestCase
         $slugManager->expects($this->once())
             ->method('findSlugLike')
             ->with($this->equalTo($slugViolation))
-            ->will($this->returnValue([$slugFoo, $slugBar, $slugBaz]));
+            ->willReturn([$slugFoo, $slugBar, $slugBaz]);
 
         $service = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface')->getMock();
         $service->expects($this->once())
             ->method('createSlug')
             ->with($this->equalTo($entity), $this->equalTo(false))
-            ->will($this->returnValue($slugViolation));
+            ->willReturn($slugViolation);
         $service->expects($this->once())
             ->method('setEntitySlug')
             ->with($this->equalTo($slugViolation), $this->equalTo($entity));
 
-        $slugServiceManager = $this->getMockBuilder('Loconox\EntityRoutingBundle\Slug\SlugServiceManagerInterface')->getMock();
+        $slugServiceManager = $this->getMockBuilder(SlugServiceManager::class)
+            ->setMethods(['get'])
+            ->getMockForAbstractClass();
         $slugServiceManager->expects($this->once())
             ->method('get')
             ->with($this->equalTo($entity))
-            ->will($this->returnValue($service));
+            ->willReturn($service);
 
 
         $listener = new UniqueSlugViolationListener($slugManager, $slugServiceManager);

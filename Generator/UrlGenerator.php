@@ -2,20 +2,21 @@
 
 namespace Loconox\EntityRoutingBundle\Generator;
 
+use Loconox\EntityRoutingBundle\Host\HostServiceManager;
+use Loconox\EntityRoutingBundle\Host\Service\HostServiceInterface;
+use Loconox\EntityRoutingBundle\Slug\Service\SlugServiceInterface;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator as BaseUrlGenerator;
 use Symfony\Component\Validator\ConstraintViolation;
 
 
-class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
+class UrlGenerator extends BaseUrlGenerator
 {
     /**
      * @var SlugServiceManager
@@ -23,27 +24,37 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
     protected $slugServiceManager;
 
     /**
+     * @var HostServiceManager
+     */
+    protected $hostServiceManager;
+
+    /**
      * Constructor.
      *
      * @param RouteCollection $routes A RouteCollection instance
      * @param RequestContext $context The context
-     * @param LoggerInterface|null $logger
      * @param SlugServiceManager $slugServiceManager
+     * @param HostServiceManager $hostServiceManager
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         RouteCollection $routes,
         RequestContext $context,
-        LoggerInterface $logger = null,
-        SlugServiceManager $slugServiceManager
-    ) {
+        SlugServiceManager $slugServiceManager,
+        HostServiceManager $hostServiceManager,
+        LoggerInterface $logger = null
+    )
+    {
         parent::__construct($routes, $context, $logger);
         $this->slugServiceManager = $slugServiceManager;
+        $this->hostServiceManager = $hostServiceManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
+    public
+    function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         if (null === $route = $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
@@ -71,9 +82,9 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
             );
         }
 
-        $url      = '';
+        $url = '';
         $optional = true;
-        $message  = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
+        $message = 'Parameter "{parameter}" for route "{route}" must match "{expected}" ("{given}" given) to generate a corresponding URL.';
 
         // build url based on tokens
         foreach ($tokens as $token) {
@@ -81,20 +92,20 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
                 list ($type, $precedingChar, $regexp, $varName) = $token;
 
                 // it's a simple variable
-                if ( ! $optional || ! array_key_exists(
+                if (!$optional || !array_key_exists(
                         $varName,
                         $defaults
                     ) || null !== $mergedParams[$varName] && (string)$mergedParams[$varName] !== (string)$defaults[$varName]
                 ) {
-                    $slugService = $this->getSlugService($varName, $route);
+                    /** @var SlugServiceInterface $slugService */
+                    $slugService = $this->slugServiceManager->get($varName, $route);
                     // It's a entity slug
                     if ($slugService) {
                         $violations = $slugService->validate($mergedParams[$varName]);
                         if (count($violations) > 0) {
                             /** @var ConstraintViolation $first */
-                            $first   = $violations[0];
-                            $message = 'Parameter "{parameter}" for route "{route}" constraints violation: '.$first->getMessage(
-                                );
+                            $first = $violations[0];
+                            $message = 'Parameter "{parameter}" for route "{route}" constraints violation: ' . $first->getMessage();
                             throw new InvalidParameterException(
                                 strtr(
                                     $message,
@@ -109,8 +120,8 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
                     }
 
                     // check requirement
-                    if (null !== $this->strictRequirements && ! preg_match(
-                            '#^'.$regexp.'$#'.(empty($token[4]) ? '' : 'u'),
+                    if (null !== $this->strictRequirements && !preg_match(
+                            '#^' . $regexp . '$#' . (empty($token[4]) ? '' : 'u'),
                             $varValue
                         )
                     ) {
@@ -120,23 +131,27 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
                                     $message,
                                     array(
                                         '{parameter}' => $varName,
-                                        '{route}'     => $name,
-                                        '{expected}'  => $regexp,
-                                        '{given}'     => $varValue,
+                                        '{route}' => $name,
+                                        '{expected}' => $regexp,
+                                        '{given}' => $varValue,
                                     )
                                 )
                             );
                         }
 
+                        if ($this->logger) {
+                            $this->logger->error($message, array('parameter' => $varName, 'route' => $name, 'expected' => $regexp, 'given' => $varValue));
+                        }
+
                         return;
                     }
 
-                    $url      = $precedingChar.$varValue.$url;
+                    $url = $precedingChar . $varValue . $url;
                     $optional = false;
                 }
             } else {
                 // static text
-                $url      = $token[1].$url;
+                $url = $token[1] . $url;
                 $optional = false;
             }
         }
@@ -153,79 +168,93 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
         // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
         $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
         if ('/..' === substr($url, -3)) {
-            $url = substr($url, 0, -2).'%2E%2E';
+            $url = substr($url, 0, -2) . '%2E%2E';
         } elseif ('/.' === substr($url, -2)) {
-            $url = substr($url, 0, -1).'%2E';
+            $url = substr($url, 0, -1) . '%2E';
         }
 
         $schemeAuthority = '';
-        if ($host = $this->context->getHost()) {
-            $scheme = $this->context->getScheme();
+        $host = $this->context->getHost();
+        $scheme = $this->context->getScheme();
 
-            if ($requiredSchemes) {
-                if ( ! in_array($scheme, $requiredSchemes, true)) {
-                    $referenceType = self::ABSOLUTE_URL;
-                    $scheme        = current($requiredSchemes);
-                }
+        if ($requiredSchemes) {
+            if (!\in_array($scheme, $requiredSchemes, true)) {
+                $referenceType = self::ABSOLUTE_URL;
+                $scheme = current($requiredSchemes);
             }
+        }
 
-            if ($hostTokens) {
-                $routeHost = '';
-                foreach ($hostTokens as $token) {
-                    if ('variable' === $token[0]) {
-                        if (null !== $this->strictRequirements && ! preg_match(
-                                '#^'.$token[2].'$#i'.(empty($token[4]) ? '' : 'u'),
-                                $mergedParams[$token[3]]
-                            )
-                        ) {
-                            if ($this->strictRequirements) {
-                                throw new InvalidParameterException(
-                                    strtr(
-                                        $message,
-                                        array(
-                                            '{parameter}' => $token[3],
-                                            '{route}'     => $name,
-                                            '{expected}'  => $token[2],
-                                            '{given}'     => $mergedParams[$token[3]],
-                                        )
+        if ($hostTokens) {
+            $routeHost = '';
+            foreach ($hostTokens as $token) {
+                if ('variable' === $token[0]) {
+                    list ($type, $precedingChar, $regexp, $varName) = $token;
+                    /** @var HostServiceInterface $hostService */
+                    $hostService = $this->hostServiceManager->get($varName, $route);
+
+                    if ($hostService) {
+                        $varValue = $hostService->getHost($mergedParams[$varName]);
+                    } // else a simple var
+                    else {
+                        $varValue = $mergedParams[$varName];
+                    }
+
+                    if (null !== $this->strictRequirements && !preg_match(
+                            '#^' . $regexp . '$#i' . (empty($token[4]) ? '' : 'u'),
+                            $varValue
+                        )
+                    ) {
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException(
+                                strtr(
+                                    $message,
+                                    array(
+                                        '{parameter}' => $varName,
+                                        '{route}' => $name,
+                                        '{expected}' => $regexp,
+                                        '{given}' => $varValue,
                                     )
-                                );
-                            }
-
-                            return;
+                                )
+                            );
                         }
 
-                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
-                    } else {
-                        $routeHost = $token[1].$routeHost;
-                    }
-                }
+                        if ($this->logger) {
+                            $this->logger->error($message, array('parameter' => $varName, 'route' => $name, 'expected' => $regexp, 'given' => $varValue));
+                        }
 
-                if ($routeHost !== $host) {
-                    $host = $routeHost;
-                    if (self::ABSOLUTE_URL !== $referenceType) {
-                        $referenceType = self::NETWORK_PATH;
+                        return;
                     }
+
+                    $routeHost = $precedingChar . $varValue . $routeHost;
+                } else {
+                    $routeHost = $token[1] . $routeHost;
                 }
             }
 
-            if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
-                $port = '';
-                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+            if ($routeHost !== $host) {
+                $host = $routeHost;
+                if (self::ABSOLUTE_URL !== $referenceType) {
+                    $referenceType = self::NETWORK_PATH;
                 }
-
-                $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
-                $schemeAuthority .= $host.$port;
             }
+        }
+
+        if ((self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) && !empty($host)) {
+            $port = '';
+            if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
+                $port = ':' . $this->context->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
+                $port = ':' . $this->context->getHttpsPort();
+            }
+
+            $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
+            $schemeAuthority .= $host . $port;
         }
 
         if (self::RELATIVE_PATH === $referenceType) {
             $url = self::getRelativePath($this->context->getPathInfo(), $url);
         } else {
-            $url = $schemeAuthority.$this->context->getBaseUrl().$url;
+            $url = $schemeAuthority . $this->context->getBaseUrl() . $url;
         }
 
         // add a query string if needed
@@ -251,27 +280,13 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface, Co
         if ($extra && $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986)) {
             // "/" and "?" can be left decoded for better user experience, see
             // http://tools.ietf.org/html/rfc3986#section-3.4
-            $url .= '?'.strtr($query, array('%2F' => '/'));
+            $url .= '?' . strtr($query, array('%2F' => '/'));
         }
 
         if ('' !== $fragment) {
-            $url .= '#'.strtr(rawurlencode($fragment), array('%2F' => '/', '%3F' => '?'));
+            $url .= '#' . strtr(rawurlencode($fragment), array('%2F' => '/', '%3F' => '?'));
         }
 
         return $url;
-    }
-
-    private function getSlugService($attr, $route)
-    {
-        if (false !== $slugService = $this->slugServiceManager->get($attr)) {
-            return $slugService;
-        }
-
-        $types = $route->getOption('types');
-        if (isset($types[$attr]) && (false !== $slugService = $this->slugServiceManager->get($types[$attr]))) {
-            return $slugService;
-        }
-
-        return null;
     }
 }
