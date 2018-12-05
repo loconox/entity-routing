@@ -1,30 +1,37 @@
 Usage
 =====
 
-Assuming you have a `Product` class:
+# For parameters in path
+
+Assuming you have a `Product` class and you want to have the name of products as a slug in your routes:
 
 ```php
+<?php
 class Product
 {
     private $name;
-    \\ ...
+    // ...
 }
 ```
 
 Within you `ProductController`, create a route with the new annotation class `Loconox\EntityRoutingBundle\Annotation\Route`
 
 ```php
+<?php
+// ...
+
 use Loconox\EntityRoutingBundle\Annotation\Route;
-\\ ...
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 
 class ProductController extends Controller
 {
     /**
      * @Route("/{product}", name="product")
      */
-    public function productAction($product)
+    public function index($product): void
     {
-        \\ ...
+        // ...
     }
 }
 ```
@@ -125,13 +132,103 @@ class ProductSlugService extends BaseSlugService
 Declare the service:
 
 ```yaml
-    app.slug.service.product:
-        class: AppBundle\Slug\Service\ProductSlugService
+# /config/services.yaml
+services:
+    App\Slug\Service\ProductSlugService:
         arguments:
-            - "AppBundle\\Entity\\Product"
+            - "App\\Entity\\Product"
             - "@loconox_entity_routing.manager.slug"
         calls:
             - [ setEntityManager, [ "@loconox_entity_routing.entity_manager" ]]
         tags:
             - { name: loconox_entity_routing.slug.service, alias: product }
+```
+
+# For parameters in host
+
+Assuming you have a `Website` class and you want to have the domain attribute as a parameter for your routes:
+
+```php
+<?php
+class Website
+{
+    private $domain;
+    // ...
+}
+```
+
+Within you `IndexController`, create a route with the new annotation class `Loconox\EntityRoutingBundle\Annotation\Route`
+
+```php
+<?php
+// ...
+
+use Loconox\EntityRoutingBundle\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+
+class IndexController extends Controller
+{
+    /**
+     * @Route("/", name="index",  host="{domain}")
+     */
+    public function index($domain): void
+    {
+        // ...
+    }
+}
+```
+
+Create a `WebsiteHostService` class and implement the different functions corresponding to your needs.
+
+```php
+<?php
+
+namespace App\Host\Service;
+
+
+use App\Entity\Website;
+use Loconox\EntityRoutingBundle\Host\Service\AbstractHostService;
+
+class WebsiteHostService extends AbstractHostService
+{
+    // ...
+    
+     /**
+         * Find an entity by its hostname field and return it.
+         *
+         * @param string $domain
+         * @return Website|null
+         */
+        public function findOneByHost($domain)
+        {
+            $repo = $this->entityManager->getRepository($this->getClass());
+    
+            return $repo->findOneBy(['domain' => $domain]);
+        }
+    
+        /**
+         * Returns the host are part of the host, from the related entity.
+         *
+         * @param Website $website
+         * @return string
+         */
+        public function getHost($website): string
+        {
+            return $website->getDomain();
+        }
+}
+```
+
+Declare the service:
+
+```yaml
+# /config/services.yaml
+services:
+    App\Host\Service\WebsiteHostService:
+        arguments:
+            - "App\\Entity\\Website"
+            - "@doctrine.orm.default_entity_manager"
+        tags:
+            - { name: loconox_entity_routing.host.service, alias: domain }
 ```
