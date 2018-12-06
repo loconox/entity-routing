@@ -7,6 +7,7 @@ use Loconox\EntityRoutingBundle\Matcher\UrlMatcher;
 use Loconox\EntityRoutingBundle\Model\SlugManagerInterface;
 use Loconox\EntityRoutingBundle\Route\SlugRouter;
 use Loconox\EntityRoutingBundle\Slug\SlugServiceManager;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
@@ -39,7 +40,7 @@ class SlugRouterTest extends TestCase
     {
         $this->slugServiceManager = $this->getMockBuilder(SlugServiceManager::class);
         $this->slugManager        = $this->getMockBuilder(SlugManagerInterface::class)->getMock();
-        $this->loader             = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $this->loader             = $this->getMockBuilder(LoaderInterface::class)->getMock();
     }
 
     public function testSupports()

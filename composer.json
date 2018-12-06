@@ -2,7 +2,7 @@
     "name": "loconox/entity-routing-bundle",
     "type": "symfony-bundle",
     "description": "Symfony EntityRoutingBundle",
-    "keywords": ["Routing", "Entity"],
+    "keywords": ["Routing", "Entity", "symfony", "slug", "hostname", "domain"],
     "homepage": "https://github.com/loconox/EntityRoutingBundle",
     "license": "MIT",
     "authors": [

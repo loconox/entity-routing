@@ -331,7 +331,7 @@ class UrlMatcherTest extends TestCase
 
         $hostService = $this->getMockBuilder(AbstractHostService::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findOneBy'])
+            ->setMethods(['findOneByHost'])
             ->getMockForAbstractClass();
         $hostService
             ->expects($this->atLeastOnce())
