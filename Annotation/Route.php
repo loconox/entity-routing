@@ -10,7 +10,7 @@ use Loconox\EntityRoutingBundle\Route\RouteCompiler;
  * cause some unwanted requests to be matched.
  *
  * @Annotation
- * @Target({"METHOD"})
+ * @Target({"METHOD", "CLASS"})
  */
 class Route
 {

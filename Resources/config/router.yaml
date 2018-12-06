@@ -7,6 +7,7 @@ parameters:
     loconox_entity_routing.route.loader.xml.class: Loconox\EntityRoutingBundle\Loader\XmlFileLoader
     loconox_entity_routing.route.loader.service.class: Symfony\Component\Routing\Loader\DependencyInjection\ServiceRouterLoader
     loconox_entity_routing.route.loader.glob.class: Symfony\Component\Routing\Loader\GlobFileLoader
+    loconox_entity_routing.route.loader.class_annotation.class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
     loconox_entity_routing.annotation.route.class: Loconox\EntityRoutingBundle\Annotation\Route
 
 services:
@@ -27,7 +28,7 @@ services:
         arguments: [ "@loconox_entity_routing.route.loader_resolver" ]
 
     loconox_entity_routing.route.loader.class_annotation:
-        class: Loconox\EntityRoutingBundle\Loader\AnnotationClassLoader
+        class: "%loconox_entity_routing.route.loader.class_annotation.class%"
         arguments: [ "@annotation_reader" ]
         calls:
             - [ setRouteAnnotationClass, [ "%loconox_entity_routing.annotation.route.class%"]]
