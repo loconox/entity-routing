@@ -11,6 +11,7 @@ namespace Loconox\EntityRoutingBundle\Annotation;
 class Route
 {
     private $path;
+    private $localizedPaths = [];
     private $name;
     private $requirements = array();
     private $options = array();
@@ -31,6 +32,10 @@ class Route
      */
     public function __construct(array $data)
     {
+        if (isset($data['localized_paths'])) {
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', \get_class($this)));
+        }
+
         if (isset($data['value'])) {
             $data['path'] = $data['value'];
             unset($data['value']);
@@ -53,6 +58,16 @@ class Route
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function setLocalizedPaths(array $localizedPaths)
+    {
+        $this->localizedPaths = $localizedPaths;
+    }
+
+    public function getLocalizedPaths(): array
+    {
+        return $this->localizedPaths;
     }
 
     public function setHost($pattern)
@@ -107,7 +122,7 @@ class Route
 
     public function setSchemes($schemes)
     {
-        $this->schemes = is_array($schemes) ? $schemes : array($schemes);
+        $this->schemes = \is_array($schemes) ? $schemes : array($schemes);
     }
 
     public function getSchemes()
@@ -117,7 +132,7 @@ class Route
 
     public function setMethods($methods)
     {
-        $this->methods = is_array($methods) ? $methods : array($methods);
+        $this->methods = \is_array($methods) ? $methods : array($methods);
     }
 
     public function getMethods()
