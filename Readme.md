@@ -92,33 +92,23 @@ Add bundle to kernel:
 
 ```php
 <?php
-// app/AppKernel.php
+// /config/bundles.php
 
-// ...
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        $bundles = array(
-            // ...
-            new \Symfony\Cmf\Bundle\RoutingBundle\CmfRoutingBundle(),
-        );
-
-        // ...
-    }
-
+return [
     // ...
-}
+    Loconox\EntityRoutingBundle\LoconoxEntityRoutingBundle::class => ['all' => true],
+];
+
 ```
 
 Configure the chain routing:
 
 ```yaml
 cmf_routing:
-    chain:
-        routers_by_id:
-            loconox_entity_routing.router: 100
-            router.default: 75
+  chain:
+    routers_by_id:
+      loconox_entity_routing.router: 100
+        router.default: 75
 ```
 
 ### Routing bundle
@@ -127,9 +117,13 @@ Optionally, you can specify a different entity manager for your slug to be store
 
 ```yaml
 loconox_entity_routing:
-    entity_manager: default
-    class:
-        slug: Loconox\EntityRoutingBundle\Entity\Slug
+  entity_manager: default
+  class:
+    slug: 'Loconox\EntityRoutingBundle\Entity\Slug'
+  router:
+    resource: 'kernel::loadRoutes'
+    type: 'service'
+
 ```
 
 Usage

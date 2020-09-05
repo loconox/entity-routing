@@ -7,7 +7,7 @@ Assuming you have a `Product` class:
 class Product
 {
     private $name;
-    \\ ...
+    // ...
 }
 ```
 
@@ -15,7 +15,7 @@ Within you `ProductController`, create a route with the new annotation class `Lo
 
 ```php
 use Loconox\EntityRoutingBundle\Annotation\Route;
-\\ ...
+// ...
 
 class ProductController extends Controller
 {
@@ -24,7 +24,7 @@ class ProductController extends Controller
      */
     public function productAction($product)
     {
-        \\ ...
+        // ...
     }
 }
 ```
@@ -125,8 +125,7 @@ class ProductSlugService extends BaseSlugService
 Declare the service:
 
 ```yaml
-    app.slug.service.product:
-        class: AppBundle\Slug\Service\ProductSlugService
+    App\Slug\Service\ProductSlugService:
         arguments:
             - "AppBundle\\Entity\\Product"
             - "@loconox_entity_routing.manager.slug"
